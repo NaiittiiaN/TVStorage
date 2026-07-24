@@ -57,12 +57,13 @@ class SettingsViewModel @Inject constructor(
             val currentVersion = "1.2.3"
             val release = updateManager.checkForUpdates(currentVersion)
             if (release != null) {
-                val apkAsset = release.assets.find { it.name.endsWith(".apk") }
+                // Ищем файл с расширением .apk без учета регистра
+                val apkAsset = release.assets.find { it.name.endsWith(".apk", ignoreCase = true) }
                 if (apkAsset != null) {
                     _message.value = "Найдено обновление ${release.tag_name}. Начинаю скачивание..."
                     updateManager.downloadAndInstall(apkAsset.browser_download_url)
                 } else {
-                    _message.value = "Обновление найдено, но установочный файл отсутствует"
+                    _message.value = "Обновление найдено, но установочный файл (.apk) не прикреплен к релизу"
                 }
             } else {
                 _message.value = "У вас установлена последняя версия"

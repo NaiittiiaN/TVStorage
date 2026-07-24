@@ -46,7 +46,9 @@ class UpdateManager(private val context: Context) {
             // Сравниваем тег версии (например "v1.2.3") с текущей версией
             val latestVersion = release.tag_name.removePrefix("v")
             if (latestVersion != currentVersion) {
-                release
+                // Ищем любой файл, заканчивающийся на .apk (без учета регистра)
+                val hasApk = release.assets.any { it.name.endsWith(".apk", ignoreCase = true) }
+                if (hasApk) release else null
             } else {
                 null
             }
@@ -57,7 +59,8 @@ class UpdateManager(private val context: Context) {
 
     fun downloadAndInstall(url: String) {
         try {
-            val request = DownloadManager.Request(Uri.parse(url))
+            val downloadUrl = if (url.startsWith("http")) url else "https://github.com$url"
+            val request = DownloadManager.Request(Uri.parse(downloadUrl))
                 .setTitle("Обновление TV Storage")
                 .setDescription("Загрузка новой версии...")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)

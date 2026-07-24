@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,12 +27,22 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug
 
+      - name: Rename APK
+        run: mv app/build/outputs/apk/debug/*.apk app/build/outputs/apk/debug/TV_Storage.apk
+
       - name: Create Release
-        id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          files: app/build/outputs/apk/debug/TV Storage.apk
+          files: app/build/outputs/apk/debug/TV_Storage.apk
           name: Release ${{ github.ref_name }}
+          body: |
+            Автоматическая сборка TV Storage v${{ github.ref_name }}
+            
+            Изменения в этой версии:
+            - Удален функционал фото
+            - Переименование в S/N
+            - Полноценный веб-интерфейс
+            - Исправлен расчет стоимости
           draft: false
           prerelease: false
         env:
