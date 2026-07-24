@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
 
     private fun checkVersion() {
         viewModelScope.launch {
-            val currentVersion = "1.2.3"
+            val currentVersion = "1.2.4"
             val lastVersion = themeStore.lastSeenVersion.first()
             if (lastVersion != currentVersion) {
                 _showWhatsNew.value = true
@@ -81,7 +81,7 @@ class HomeViewModel @Inject constructor(
 
     fun dismissWhatsNew() {
         viewModelScope.launch {
-            themeStore.setLastSeenVersion("1.2.3")
+            themeStore.setLastSeenVersion("1.2.4")
             _showWhatsNew.value = false
         }
     }
