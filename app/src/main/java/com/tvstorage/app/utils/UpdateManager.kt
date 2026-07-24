@@ -36,14 +36,24 @@ class UpdateManager(private val context: Context) {
         }
     }
 
-    // ЗАМЕНИТЕ YOUR_USERNAME НА ВАШ ЛОГИН GITHUB
+    /**
+     * ВАЖНО: Замените 'YOUR_USERNAME' на ваш логин GitHub и 'TVStorage' на имя репозитория.
+     * Ссылка должна вести на API последнего релиза.
+     */
     private val repoUrl = "https://api.github.com/repos/YOUR_USERNAME/TVStorage/releases/latest"
 
     suspend fun checkForUpdates(currentVersion: String): GitHubRelease? {
         return try {
             val response = client.get(repoUrl)
             val release: GitHubRelease = response.body()
-            if (release.tag_name != currentVersion) release else null
+            
+            // Сравниваем тег версии (например "v1.2.3") с текущей версией
+            val latestVersion = release.tag_name.removePrefix("v")
+            if (latestVersion != currentVersion) {
+                release
+            } else {
+                null
+            }
         } catch (e: Exception) {
             null
         }
@@ -55,16 +65,16 @@ class UpdateManager(private val context: Context) {
                 .setTitle("Обновление TV Storage")
                 .setDescription("Загрузка новой версии...")
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "TVStorage_Update.apk")
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "TV_Storage_Update.apk")
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
 
             val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
             dm.enqueue(request)
             
-            Toast.makeText(context, "Загрузка началась. Установка запустится после нажатия на уведомление.", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Загрузка началась. После завершения нажмите на уведомление для установки.", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
-            Toast.makeText(context, "Ошибка загрузки: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Ошибка при запуске загрузки: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 }
