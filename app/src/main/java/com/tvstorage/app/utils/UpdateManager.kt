@@ -36,11 +36,7 @@ class UpdateManager(private val context: Context) {
         }
     }
 
-    /**
-     * ВАЖНО: Замените 'YOUR_USERNAME' на ваш логин GitHub и 'TVStorage' на имя репозитория.
-     * Ссылка должна вести на API последнего релиза.
-     */
-    private val repoUrl = "https://api.github.com/repos/YOUR_USERNAME/TVStorage/releases/latest"
+    private val repoUrl = "https://api.github.com/repos/NaiittiiaN/TVStorage/releases/latest"
 
     suspend fun checkForUpdates(currentVersion: String): GitHubRelease? {
         return try {
