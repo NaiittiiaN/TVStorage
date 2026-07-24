@@ -1,8 +1,12 @@
 package com.tvstorage.app.utils
 
 import android.app.DownloadManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Environment
 import android.widget.Toast
 import io.ktor.client.*
@@ -42,16 +46,11 @@ class UpdateManager(private val context: Context) {
         return try {
             val response = client.get(repoUrl)
             val release: GitHubRelease = response.body()
-            
-            // Сравниваем тег версии (например "v1.2.3") с текущей версией
             val latestVersion = release.tag_name.removePrefix("v")
             if (latestVersion != currentVersion) {
-                // Ищем любой файл, заканчивающийся на .apk (без учета регистра)
                 val hasApk = release.assets.any { it.name.endsWith(".apk", ignoreCase = true) }
                 if (hasApk) release else null
-            } else {
-                null
-            }
+            } else null
         } catch (e: Exception) {
             null
         }
@@ -69,9 +68,32 @@ class UpdateManager(private val context: Context) {
                 .setAllowedOverRoaming(true)
 
             val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            dm.enqueue(request)
+            val downloadId = dm.enqueue(request)
+
+            // РЕГИСТРИРУЕМ ПРИЕМНИК ДЛЯ АВТО-УСТАНОВКИ
+            val onComplete = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+                    if (id == downloadId) {
+                        val installIntent = Intent(Intent.ACTION_VIEW).apply {
+                            val uri = dm.getUriForDownloadedFile(downloadId)
+                            setDataAndType(uri, "application/vnd.android.package-archive")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        }
+                        context.startActivity(installIntent)
+                        context.unregisterReceiver(this)
+                    }
+                }
+            }
             
-            Toast.makeText(context, "Загрузка началась. После завершения нажмите на уведомление для установки.", Toast.LENGTH_LONG).show()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_EXPORTED)
+            } else {
+                context.registerReceiver(onComplete, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+            }
+            
+            Toast.makeText(context, "Загрузка началась. Обновление запустится автоматически.", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
             Toast.makeText(context, "Ошибка при запуске загрузки: ${e.message}", Toast.LENGTH_SHORT).show()
         }
