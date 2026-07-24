@@ -15,16 +15,29 @@ android {
         applicationId = "com.tvstorage.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.2.5"
+        versionCode = 8
+        versionName = "1.2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("../debug.keystore")
+            storePassword = "androiddebugkey"
+            keyAlias = "androiddebugkey"
+            keyPassword = "androiddebugkey"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("release")
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

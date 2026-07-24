@@ -6,3 +6,17 @@ plugins {
     id("com.google.dagger.hilt.android") version "2.53.1" apply false
     id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0" apply false
 }
+
+tasks.register("generateKeystore") {
+    doLast {
+        val keystoreFile = file("debug.keystore")
+        if (!keystoreFile.exists()) {
+            exec {
+                commandLine("keytool", "-genkey", "-v", "-keystore", keystoreFile.absolutePath, 
+                            "-storepass", "androiddebugkey", "-alias", "androiddebugkey", 
+                            "-keypass", "androiddebugkey", "-keyalg", "RSA", "-keysize", "2048", 
+                            "-validity", "10000", "-dname", "CN=Android Debug,O=Android,C=US")
+            }
+        }
+    }
+}
