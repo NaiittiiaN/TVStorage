@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,8 +36,12 @@ fun SettingsScreen(
     val showWhatsNew by viewModel.showWhatsNew.collectAsState()
     val areAllPaused by viewModel.areAllPaused.collectAsState()
     val isCheckingUpdates by viewModel.isCheckingUpdates.collectAsState()
+    val webPort by viewModel.webPort.collectAsState()
+    
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+
+    var editPortValue by remember(webPort) { mutableStateOf(webPort.toString()) }
 
     if (showWhatsNew) {
         WhatsNewDialog(onDismiss = { viewModel.hideWhatsNew() })
@@ -201,20 +207,43 @@ fun SettingsScreen(
                             fontWeight = FontWeight.Bold
                         )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = editPortValue,
+                            onValueChange = { if (it.length <= 5 && it.all { char -> char.isDigit() }) editPortValue = it },
+                            label = { Text("Порт сервера") },
+                            modifier = Modifier.width(120.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Button(
+                            onClick = {
+                                val newPort = editPortValue.toIntOrNull() ?: 4848
+                                viewModel.setWebPort(newPort)
+                            },
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Применить")
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Откройте в браузере на компьютере:",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "http://$ipAddress:4848",
+                        text = "http://$ipAddress:$webPort",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Устройства должны быть в одной Wi-Fi сети.",
+                        text = "Устройства должны быть в одной Wi-Fi сети. После изменения порта может потребоваться перезапуск приложения.",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

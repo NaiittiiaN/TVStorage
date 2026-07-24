@@ -44,6 +44,9 @@ class SettingsViewModel @Inject constructor(
     val isDarkTheme: StateFlow<Boolean?> = themeStore.isDarkTheme
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    val webPort: StateFlow<Int> = themeStore.webPort
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 4848)
+
     val areAllPaused: StateFlow<Boolean> = repository.getAllActive().map { list ->
         list.isNotEmpty() && list.all { it.isPaused }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -78,6 +81,13 @@ class SettingsViewModel @Inject constructor(
     fun setDarkTheme(isDark: Boolean?) {
         viewModelScope.launch {
             themeStore.setDarkTheme(isDark)
+        }
+    }
+
+    fun setWebPort(port: Int) {
+        viewModelScope.launch {
+            themeStore.setWebPort(port)
+            _message.value = "Порт изменен на $port. Перезапустите сервер."
         }
     }
 
