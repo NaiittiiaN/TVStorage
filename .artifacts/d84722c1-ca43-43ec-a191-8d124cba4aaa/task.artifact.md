@@ -1,0 +1,6 @@
+- [x] Create `TvTextField.kt` component
+- [x] Update `AddTVScreen.kt` to use `TvTextField`
+- [x] Update `SettingsScreen.kt` to use `TvTextField`
+- [x] Bump version to 1.2.5 (versionCode 7)
+- [x] Update `WhatsNewDialog.kt` and `README.md`
+- [ ] Inform user about GitHub deployment steps

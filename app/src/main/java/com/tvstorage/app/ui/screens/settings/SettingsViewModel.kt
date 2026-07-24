@@ -54,7 +54,7 @@ class SettingsViewModel @Inject constructor(
     fun checkForUpdates() {
         viewModelScope.launch {
             _isCheckingUpdates.value = true
-            val currentVersion = "1.2.4"
+            val currentVersion = "1.2.5"
             val release = updateManager.checkForUpdates(currentVersion)
             if (release != null) {
                 // Ищем файл с расширением .apk без учета регистра

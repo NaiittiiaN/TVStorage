@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.tvstorage.app.ui.components.TvTextField
 import com.tvstorage.app.utils.DateUtils
 import java.util.Calendar
 
@@ -86,16 +87,16 @@ fun AddTVScreen(
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                OutlinedTextField(
+                TvTextField(
                     value = uiState.orderNumber,
                     onValueChange = viewModel::onOrderNumberChange,
-                    label = { Text("S/N *") },
-                    placeholder = { Text("Введите серийный номер") },
+                    label = "S/N *",
+                    placeholder = "Введите серийный номер",
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester),
+                    initialEditing = tvId == null,
                     singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
                     isError = uiState.orderNumberError != null,
                     supportingText = uiState.orderNumberError?.let { { Text(it) } },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -106,20 +107,32 @@ fun AddTVScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                TvField(uiState.brand, viewModel::onBrandChange, "Бренд", imeAction = ImeAction.Next)
+                TvTextField(
+                    value = uiState.brand,
+                    onValueChange = viewModel::onBrandChange,
+                    label = "Бренд",
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                TvField(uiState.model, viewModel::onModelChange, "Модель", imeAction = ImeAction.Next)
+                TvTextField(
+                    value = uiState.model,
+                    onValueChange = viewModel::onModelChange,
+                    label = "Модель",
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                )
                 Spacer(modifier = Modifier.height(12.dp))
-                TvField(uiState.clientName, viewModel::onClientNameChange, "ФИО клиента", imeAction = ImeAction.Next)
+                TvTextField(
+                    value = uiState.clientName,
+                    onValueChange = viewModel::onClientNameChange,
+                    label = "ФИО клиента",
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 
-                OutlinedTextField(
+                TvTextField(
                     value = uiState.dailyCost,
                     onValueChange = viewModel::onDailyCostChange,
-                    label = { Text("Стоимость хранения (₽)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
+                    label = "Стоимость хранения (₽)",
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Done
@@ -195,21 +208,3 @@ fun AddTVScreen(
     }
 }
 
-@Composable
-fun TvField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Default
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        shape = RoundedCornerShape(12.dp),
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction)
-    )
-}

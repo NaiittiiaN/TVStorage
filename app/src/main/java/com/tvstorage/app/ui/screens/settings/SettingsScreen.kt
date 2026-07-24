@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.tvstorage.app.ui.components.TvTextField
 import com.tvstorage.app.ui.screens.home.WhatsNewDialog
 import com.tvstorage.app.utils.NetworkUtils
 
@@ -210,12 +211,11 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
+                        TvTextField(
                             value = editPortValue,
                             onValueChange = { if (it.length <= 5 && it.all { char -> char.isDigit() }) editPortValue = it },
-                            label = { Text("Порт сервера") },
-                            modifier = Modifier.width(120.dp),
-                            singleLine = true,
+                            label = "Порт сервера",
+                            modifier = Modifier.width(150.dp),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -387,7 +387,7 @@ fun SettingsScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "TV Storage v1.2.4",
+                        text = "TV Storage v1.2.5",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
