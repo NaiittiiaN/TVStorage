@@ -48,12 +48,6 @@ fun SettingsScreen(
         WhatsNewDialog(onDismiss = { viewModel.hideWhatsNew() })
     }
 
-    val backupLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/octet-stream")
-    ) { uri ->
-        uri?.let { viewModel.backupDatabase(it) }
-    }
-
     val restoreLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri ->
@@ -297,7 +291,7 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Button(
-                            onClick = { backupLauncher.launch("tvstorage_backup.db") },
+                            onClick = { viewModel.exportDatabaseDirectly() },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp)
                         ) {
@@ -307,7 +301,7 @@ fun SettingsScreen(
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Button(
-                            onClick = { restoreLauncher.launch(arrayOf("application/octet-stream")) },
+                            onClick = { restoreLauncher.launch(arrayOf("application/octet-stream", "*/*")) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
